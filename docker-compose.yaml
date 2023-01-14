@@ -1,0 +1,44 @@
+version: '3'
+services:
+  mysql-server:
+    image: mysql
+    restart: always
+    cap_add:
+      - SYS_NICE
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USER=$MYSQL_USERNAME
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    volumes:
+      - db:/var/lib/mysql
+  api-service:
+    depends_on:
+      - mysql-server
+    restart: unless-stopped
+    links:
+      - mysql-server
+    build: .
+    environment:
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USERNAME: $MYSQL_USERNAME
+      JWT_SECRET: $JWT_SECRET
+      JWT_EXPIRES_IN: $JWT_EXPIRES_IN
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    stdin_open: true
+    tty: true
+volumes:
+  app:
+  db:
