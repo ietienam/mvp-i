@@ -51,7 +51,7 @@ const protect = async (req, res, next) => {
     req.user = currentUser;
     next();
   } catch (error) {
-    return res.status(500).json({
+    return next({
       error: "Internal server error",
       cause: error,
     });
